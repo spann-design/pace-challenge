@@ -39,20 +39,20 @@ function CheckIn({ bundle, today }: { bundle: ChallengeBundle; today: string }) 
 
   return (
     <div>
-      <div className="card">
-        <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="card-hero">
+        <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <div className="text-sm text-ink-2">{challenge.title}</div>
-            <div className="text-xl font-bold">
+            <div className="text-sm font-medium text-white">{challenge.title}</div>
+            <div className="text-3xl font-bold tracking-tight">
               {t.phase === "upcoming" ? "Starts soon" : t.phase === "finished" ? "Challenge complete" : `Day ${t.dayNumber} of ${t.totalDays}`}
             </div>
           </div>
-          <PaceBadge pace={s.pace} />
+          <PaceBadge pace={s.pace} onHero />
         </div>
-        <div className="mt-3">
-          <Meter value={t.dayNumber / t.totalDays} label="Challenge progress" />
+        <div className="mt-4">
+          <Meter value={t.dayNumber / t.totalDays} label="Challenge progress" onHero />
         </div>
-        <div className="mt-2 flex justify-between text-xs text-ink-2">
+        <div className="mt-2 flex justify-between text-sm font-medium text-white">
           <span>Habit consistency {Math.round(s.habits.overall * 100)}%</span>
           <span>
             Streak {s.streak} {s.streak === 1 ? "day" : "days"}
@@ -61,15 +61,15 @@ function CheckIn({ bundle, today }: { bundle: ChallengeBundle; today: string }) 
       </div>
 
       <div className="mb-2 mt-6 flex items-center justify-between gap-2">
-        <button className="btn btn-ghost !px-3" disabled={!canPrev} onClick={() => setDate(addDays(date, -1))} aria-label="Previous day">
-          ‹
+        <button className="btn btn-ghost !w-11 !px-0" disabled={!canPrev} onClick={() => setDate(addDays(date, -1))} aria-label="Previous day">
+          <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M15 6l-6 6 6 6" /></svg>
         </button>
         <div className="text-center">
           <h2 className="text-base font-bold">{date === today ? "Today's check-in" : "Check-in"}</h2>
           <div className="text-xs text-ink-2">{formatLong(date)}</div>
         </div>
-        <button className="btn btn-ghost !px-3" disabled={!canNext} onClick={() => setDate(addDays(date, 1))} aria-label="Next day">
-          ›
+        <button className="btn btn-ghost !w-11 !px-0" disabled={!canNext} onClick={() => setDate(addDays(date, 1))} aria-label="Next day">
+          <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M9 6l6 6-6 6" /></svg>
         </button>
       </div>
 
@@ -203,7 +203,7 @@ function DayForm({
                 <button
                   key={n}
                   type="button"
-                  className={`h-10 w-10 rounded-full border text-sm font-semibold ${
+                  className={`h-11 w-11 rounded-full border text-sm font-semibold ${
                     energy === n ? "border-accent bg-accent text-accent-ink" : "border-line text-ink-2"
                   }`}
                   onClick={() => {

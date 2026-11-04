@@ -2,22 +2,23 @@
 
 :root {
   color-scheme: light;
-  --page: #f9f9f7;
-  --surface: #fcfcfb;
-  --surface-2: #f1f0ec;
+  --page: #f3f3f1;
+  --surface: #ffffff;
+  --surface-2: #efefec;
   --ink: #0b0b0b;
   --ink-2: #52514e;
-  --muted: #898781;
+  --muted: #6f6d68; /* 4.5:1+ on white and page */
   --grid: #e1e0d9;
   --axis: #c3c2b7;
   --line: rgba(11, 11, 11, 0.1);
-  --accent: #2a78d6;
+  --accent: #d42a3a; /* brand red; white text on it is ~5:1 */
+  --accent-hover: #b81f2e;
   --accent-ink: #ffffff;
-  --series-2: #eb6834;
+  --series-2: #3d3c39;
   --good: #0ca30c;
   --good-text: #006300;
   --warning: #fab219;
-  --serious: #ec835a;
+  --serious: #d98a00; /* "behind" is amber so it doesn't blur with the brand red */
   --critical: #d03b3b;
 }
 
@@ -26,16 +27,18 @@
     color-scheme: dark;
     --page: #0d0d0d;
     --surface: #1a1a19;
-    --surface-2: #242422;
+    --surface-2: #262624;
     --ink: #f0efec;
     --ink-2: #c3c2b7;
-    --muted: #898781;
+    --muted: #9a9892;
     --grid: #2c2c2a;
     --axis: #383835;
     --line: rgba(255, 255, 255, 0.1);
-    --accent: #3987e5;
+    --accent: #d6343f;
+    --accent-hover: #e14a54;
     --accent-ink: #ffffff;
-    --series-2: #d95926;
+    --series-2: #c3c2b7;
+    --serious: #f0a020;
     --good-text: #0ca30c;
   }
 }
@@ -56,7 +59,7 @@
   --color-warning: var(--warning);
   --color-serious: var(--serious);
   --color-critical: var(--critical);
-  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: var(--font-inter-tight), system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 body {
@@ -66,6 +69,12 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+h1,
+h2,
+h3 {
+  letter-spacing: -0.02em;
+}
+
 .tabular {
   font-variant-numeric: tabular-nums;
 }
@@ -73,7 +82,8 @@ body {
 /* Form controls */
 .input {
   width: 100%;
-  border-radius: 0.5rem;
+  min-height: 2.75rem;
+  border-radius: 0.75rem;
   border: 1px solid var(--line);
   background: var(--surface);
   padding: 0.5rem 0.75rem;
@@ -90,8 +100,9 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.875rem;
+  min-height: 2.75rem;
+  border-radius: 999px;
+  padding: 0.5rem 1.125rem;
   font-size: 0.9375rem;
   font-weight: 600;
   transition: background-color 120ms, opacity 120ms;
@@ -106,7 +117,7 @@ body {
   color: var(--accent-ink);
 }
 .btn-primary:hover:not(:disabled) {
-  opacity: 0.9;
+  background: var(--accent-hover);
 }
 .btn-ghost {
   background: transparent;
@@ -120,8 +131,16 @@ body {
 .card {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 0.875rem;
+  border-radius: 1.25rem;
   padding: 1rem;
+}
+
+/* Brand highlight card: red with white text, for the one thing that matters most on a screen. */
+.card-hero {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-radius: 1.25rem;
+  padding: 1.125rem;
 }
 @media (min-width: 640px) {
   .card {

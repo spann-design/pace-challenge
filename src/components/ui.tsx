@@ -11,14 +11,15 @@ const PACE_STYLE: Record<Pace, { color: string; icon: string }> = {
   no_data: { color: "var(--muted)", icon: "M6 12h12" },
 };
 
-export function PaceBadge({ pace, small }: { pace: Pace; small?: boolean }) {
+/** `onHero`: solid white pill for use on the red highlight card. */
+export function PaceBadge({ pace, small, onHero }: { pace: Pace; small?: boolean; onHero?: boolean }) {
   const s = PACE_STYLE[pace];
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full font-semibold text-ink ${
+      className={`inline-flex items-center gap-1 rounded-full font-semibold ${onHero ? "text-[#0b0b0b]" : "text-ink"} ${
         small ? "px-2 py-0.5 text-xs" : "px-2.5 py-1 text-sm"
       }`}
-      style={{ background: `color-mix(in srgb, ${s.color} 16%, transparent)` }}
+      style={{ background: onHero ? "#ffffff" : `color-mix(in srgb, ${s.color} 16%, transparent)` }}
     >
       <svg viewBox="0 0 24 24" className={small ? "h-3.5 w-3.5" : "h-4 w-4"} fill="none" stroke={s.color} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <path d={s.icon} />
@@ -32,25 +33,25 @@ export function StatTile({ label, value, sub }: { label: string; value: ReactNod
   return (
     <div className="card !p-3.5">
       <div className="text-xs font-medium text-ink-2">{label}</div>
-      <div className="mt-1 text-2xl font-bold leading-tight">{value}</div>
+      <div className="mt-1 text-2xl font-bold leading-tight tracking-tight">{value}</div>
       {sub && <div className="mt-0.5 text-xs text-muted">{sub}</div>}
     </div>
   );
 }
 
 /** Thin horizontal meter, e.g. habit consistency. */
-export function Meter({ value, label }: { value: number; label: string }) {
+export function Meter({ value, label, onHero }: { value: number; label: string; onHero?: boolean }) {
   const pct = Math.round(Math.max(0, Math.min(1, value)) * 100);
   return (
     <div
-      className="h-2 w-full overflow-hidden rounded-full bg-surface-2"
+      className={`h-2 w-full overflow-hidden rounded-full ${onHero ? "bg-white/30" : "bg-surface-2"}`}
       role="meter"
       aria-valuenow={pct}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-label={label}
     >
-      <div className="h-full rounded-full bg-accent" style={{ width: `${pct}%` }} />
+      <div className={`h-full rounded-full ${onHero ? "bg-white" : "bg-accent"}`} style={{ width: `${pct}%` }} />
     </div>
   );
 }
