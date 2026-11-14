@@ -10,7 +10,10 @@ export const metadata: Metadata = {
   title: "Pace",
   description: "Small daily habits, tracked with friends.",
   applicationName: "Pace",
+  // iPhone "Add to Home Screen": full screen, named Pace, using app/apple-icon.png.
   appleWebApp: { capable: true, title: "Pace", statusBarStyle: "default" },
+  formatDetection: { telephone: false },
+  other: { "mobile-web-app-capable": "yes" },
 };
 
 export const viewport: Viewport = {

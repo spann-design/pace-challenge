@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { mutate as globalMutate } from "swr";
 import { Icon } from "@/components/icon";
+import { InstallHint } from "@/components/install-hint";
 import { useSession, useSignOut } from "@/components/session";
 import { Avatar, Button, Card, cx, Sheet, Spinner, StreakChip, Switch, useToast } from "@/components/ui";
 import { saveGoal, useGoals, useSummary } from "@/lib/data";
@@ -60,6 +61,8 @@ export default function ProfilePage() {
           onClick={() => setSheet("accent")}
         />
       </Section>
+
+      <InstallHint />
 
       <Button variant="outline" onClick={signOut}>
         <Icon name="signout" size={18} /> Sign out
