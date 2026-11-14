@@ -1,34 +1,37 @@
 import type { Metadata, Viewport } from "next";
-import { Inter_Tight } from "next/font/google";
-import { AppProvider } from "@/components/app-provider";
-import { AppShell } from "@/components/app-shell";
+import { DM_Sans, Fraunces } from "next/font/google";
+import { ACCENT_STORAGE_KEY, ACCENTS } from "@/lib/theme";
 import "./globals.css";
 
-const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-inter-tight" });
+const fraunces = Fraunces({ subsets: ["latin"], axes: ["opsz"], variable: "--font-fraunces" });
+const dmSans = DM_Sans({ subsets: ["latin"], axes: ["opsz"], variable: "--font-dm-sans" });
 
 export const metadata: Metadata = {
-  title: "Pace: challenge tracker",
-  description: "Track fitness and wellness goals, check in daily, and keep friends accountable.",
+  title: "Pace",
+  description: "Small daily habits, tracked with friends.",
+  applicationName: "Pace",
   appleWebApp: { capable: true, title: "Pace", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f3f3f1" },
-    { media: "(prefers-color-scheme: dark)", color: "#0d0d0d" },
-  ],
+  viewportFit: "cover",
+  themeColor: "#FAF6F2",
 };
+
+// Runs before first paint so the saved accent shows immediately (no flash of the default).
+const accentScript = `try{var a=localStorage.getItem(${JSON.stringify(ACCENT_STORAGE_KEY)});if(${JSON.stringify(
+  ACCENTS.map((x) => x.id),
+)}.indexOf(a)>-1)document.documentElement.dataset.accent=a}catch(e){}`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={interTight.variable}>
-      <body className="antialiased">
-        <AppProvider>
-          <AppShell>{children}</AppShell>
-        </AppProvider>
-      </body>
+    <html lang="en" data-accent="golden" className={`${fraunces.variable} ${dmSans.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: accentScript }} />
+      </head>
+      <body>{children}</body>
     </html>
   );
 }

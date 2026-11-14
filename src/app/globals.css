@@ -1,149 +1,200 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   Pace design tokens ("Golden Hour" palette).
+   Neutrals are fixed; the gradient accent is chosen per user (data-accent on <html>).
+   Dark mode is defined but not switched on yet (set data-theme="dark" on <html>).
+   --------------------------------------------------------------------------- */
+
 :root {
-  color-scheme: light;
-  --page: #f3f3f1;
+  --bg: #faf6f2;
   --surface: #ffffff;
-  --surface-2: #efefec;
-  --ink: #0b0b0b;
-  --ink-2: #52514e;
-  --muted: #6f6d68; /* 4.5:1+ on white and page */
-  --grid: #e1e0d9;
-  --axis: #c3c2b7;
-  --line: rgba(11, 11, 11, 0.1);
-  --accent: #d42a3a; /* brand red; white text on it is ~5:1 */
-  --accent-hover: #b81f2e;
-  --accent-ink: #ffffff;
-  --series-2: #3d3c39;
-  --good: #0ca30c;
-  --good-text: #006300;
-  --warning: #fab219;
-  --serious: #d98a00; /* "behind" is amber so it doesn't blur with the brand red */
-  --critical: #d03b3b;
+  --subtle: #f2ecf0;
+  --hairline: #e8e0e6;
+  --divider: #efe8ee;
+  --line: #ddd3db; /* outlines on buttons and inputs */
+  --ink: #2a2233;
+  --ink-2: #665e70;
+  --ink-3: #8e8597; /* unchecked circles, off switches */
+  --on-accent: #2a2233;
+  --scrim: rgba(23, 20, 28, 0.36);
+  --shadow-card: 0 8px 24px rgba(42, 34, 51, 0.06);
+  --shadow-float: 0 12px 32px rgba(42, 34, 51, 0.14);
+
+  /* status chips */
+  --good-bg: #e3f1e8;
+  --good-ink: #2b7a4b;
+  --warn-bg: #fbefd9;
+  --warn-ink: #8a5a12;
+
+  /* Golden Hour (default accent) */
+  --a1: #f6b46e;
+  --a2: #b48af0;
+  --accent: linear-gradient(120deg, var(--a1), var(--a2));
+  --accent-bar: linear-gradient(90deg, var(--a1), var(--a2));
+  --tint: color-mix(in srgb, var(--a1) 22%, transparent);
+
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --page: #0d0d0d;
-    --surface: #1a1a19;
-    --surface-2: #262624;
-    --ink: #f0efec;
-    --ink-2: #c3c2b7;
-    --muted: #9a9892;
-    --grid: #2c2c2a;
-    --axis: #383835;
-    --line: rgba(255, 255, 255, 0.1);
-    --accent: #d6343f;
-    --accent-hover: #e14a54;
-    --accent-ink: #ffffff;
-    --series-2: #c3c2b7;
-    --serious: #f0a020;
-    --good-text: #0ca30c;
-  }
+:root[data-accent="peach"] { --a1: #f59a6b; --a2: #ec6f8e; }
+:root[data-accent="berry"] { --a1: #f48fb1; --a2: #a07ef0; }
+:root[data-accent="lagoon"] { --a1: #4cc4ae; --a2: #6e95f2; }
+:root[data-accent="sky"] { --a1: #78c4f2; --a2: #9a92f2; }
+:root[data-accent="matcha"] { --a1: #f2c75c; --a2: #86c77a; }
+
+/* Dark mode: ready for later. */
+:root[data-theme="dark"] {
+  --bg: #17141c;
+  --surface: #221e29;
+  --subtle: #2d2835;
+  --hairline: #37313f;
+  --divider: #37313f;
+  --line: #4a4354;
+  --ink: #f5f0f7;
+  --ink-2: #b4abbe;
+  --ink-3: #8e8597;
+  --on-accent: #17141c;
+  --shadow-card: none;
+  --a1: #f8bf80;
+  --a2: #bc97f3;
+  color-scheme: dark;
 }
+:root[data-theme="dark"][data-accent="peach"] { --a1: #f7a57c; --a2: #f07f9c; }
+:root[data-theme="dark"][data-accent="berry"] { --a1: #f6a0be; --a2: #b096f4; }
+:root[data-theme="dark"][data-accent="lagoon"] { --a1: #5cd0bb; --a2: #86a6f6; }
+:root[data-theme="dark"][data-accent="sky"] { --a1: #8ccdf5; --a2: #a9a2f5; }
+:root[data-theme="dark"][data-accent="matcha"] { --a1: #f5d070; --a2: #97d18b; }
 
 @theme inline {
-  --color-page: var(--page);
+  --color-bg: var(--bg);
   --color-surface: var(--surface);
-  --color-surface-2: var(--surface-2);
+  --color-subtle: var(--subtle);
+  --color-hairline: var(--hairline);
+  --color-divider: var(--divider);
+  --color-line: var(--line);
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
-  --color-muted: var(--muted);
-  --color-grid: var(--grid);
-  --color-line: var(--line);
-  --color-accent: var(--accent);
-  --color-accent-ink: var(--accent-ink);
-  --color-good: var(--good);
-  --color-good-text: var(--good-text);
-  --color-warning: var(--warning);
-  --color-serious: var(--serious);
-  --color-critical: var(--critical);
-  --font-sans: var(--font-inter-tight), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --color-ink-3: var(--ink-3);
+  --color-on-accent: var(--on-accent);
+  --color-a1: var(--a1);
+  --color-a2: var(--a2);
+  --color-tint: var(--tint);
+  --color-good-bg: var(--good-bg);
+  --color-good-ink: var(--good-ink);
+  --color-warn-bg: var(--warn-bg);
+  --color-warn-ink: var(--warn-ink);
+  --font-sans: var(--font-dm-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --radius-card: 28px;
+  --radius-panel: 20px;
+  --shadow-card: var(--shadow-card);
+  --shadow-float: var(--shadow-float);
+}
+
+/* Gradient accent fill: bg-accent for surfaces, bg-accent-bar for progress bars. */
+@utility bg-accent {
+  background-image: var(--accent);
+  color: var(--on-accent);
+}
+@utility bg-accent-bar {
+  background-image: var(--accent-bar);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--ink);
 }
 
 body {
-  background: var(--page);
-  color: var(--ink);
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1,
 h2,
-h3 {
-  letter-spacing: -0.02em;
+h3,
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 500;
 }
 
 .tabular {
   font-variant-numeric: tabular-nums;
 }
 
-/* Form controls */
-.input {
+.eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+/* Inputs: 44px+ tall, rounded, outlined. */
+.field {
+  height: 48px;
   width: 100%;
-  min-height: 2.75rem;
-  border-radius: 0.75rem;
-  border: 1px solid var(--line);
+  border-radius: 16px;
+  border: 1.5px solid var(--line);
   background: var(--surface);
-  padding: 0.5rem 0.75rem;
-  font-size: 1rem;
+  padding: 0 16px;
+  font-size: 16px; /* 16px stops iOS zooming on focus */
   color: var(--ink);
 }
-.input:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: -1px;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
-  min-height: 2.75rem;
-  border-radius: 999px;
-  padding: 0.5rem 1.125rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  transition: background-color 120ms, opacity 120ms;
-  cursor: pointer;
-}
-.btn:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-.btn-primary {
-  background: var(--accent);
-  color: var(--accent-ink);
-}
-.btn-primary:hover:not(:disabled) {
-  background: var(--accent-hover);
-}
-.btn-ghost {
-  background: transparent;
+.field::placeholder {
   color: var(--ink-2);
-  border: 1px solid var(--line);
+  opacity: 0.8;
 }
-.btn-ghost:hover:not(:disabled) {
-  background: var(--surface-2);
-}
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 1.25rem;
-  padding: 1rem;
+.field:focus-visible {
+  outline: 2px solid var(--a2);
+  outline-offset: 1px;
 }
 
-/* Brand highlight card: red with white text, for the one thing that matters most on a screen. */
-.card-hero {
-  background: var(--accent);
-  color: var(--accent-ink);
-  border-radius: 1.25rem;
-  padding: 1.125rem;
+:focus-visible {
+  outline: 2px solid var(--a2);
+  outline-offset: 2px;
 }
-@media (min-width: 640px) {
-  .card {
-    padding: 1.25rem;
+
+/* Leave room for the iPhone home indicator. */
+.pb-safe {
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+.pt-safe {
+  padding-top: max(20px, env(safe-area-inset-top));
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+.animate-pop {
+  animation: pop 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-sheet {
+  animation: sheet-up 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.animate-fade {
+  animation: fade-in 0.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }
