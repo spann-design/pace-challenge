@@ -371,7 +371,9 @@ create policy cheers_update on public.cheers for update to authenticated
 create policy cheers_delete on public.cheers for delete to authenticated
   using (user_id = auth.uid());
 revoke update on public.cheers from authenticated;
-grant update (emoji) on public.cheers to authenticated;
+-- The app "upserts" a cheer, which rewrites all three columns; the policy
+-- above still requires it to be your cheer on a log you're allowed to see.
+grant update (log_id, user_id, emoji) on public.cheers to authenticated;
 
 create policy comments_select on public.comments for select to authenticated
   using (private.can_social_log(log_id));
