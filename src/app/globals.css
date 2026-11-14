@@ -101,69 +101,73 @@
   background-image: var(--accent-bar);
 }
 
-html,
-body {
-  background: var(--bg);
-  color: var(--ink);
+@layer base {
+  html,
+  body {
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 500;
+  }
 }
 
-body {
-  font-family: var(--font-sans);
-  -webkit-tap-highlight-color: transparent;
-  -webkit-font-smoothing: antialiased;
-}
+@layer components {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
 
-h1,
-h2,
-h3,
-.font-display {
-  font-family: var(--font-display);
-  font-weight: 500;
-}
+  .eyebrow {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
 
-.tabular {
-  font-variant-numeric: tabular-nums;
-}
+  /* Inputs: 44px+ tall, rounded, outlined. */
+  .field {
+    height: 48px;
+    width: 100%;
+    border-radius: 16px;
+    border: 1.5px solid var(--line);
+    background: var(--surface);
+    padding: 0 16px;
+    font-size: 16px; /* 16px stops iOS zooming on focus */
+    color: var(--ink);
+  }
+  .field::placeholder {
+    color: var(--ink-2);
+    opacity: 0.8;
+  }
+  .field:focus-visible {
+    outline: 2px solid var(--a2);
+    outline-offset: 1px;
+  }
 
-.eyebrow {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-2);
-}
+  :focus-visible {
+    outline: 2px solid var(--a2);
+    outline-offset: 2px;
+  }
 
-/* Inputs: 44px+ tall, rounded, outlined. */
-.field {
-  height: 48px;
-  width: 100%;
-  border-radius: 16px;
-  border: 1.5px solid var(--line);
-  background: var(--surface);
-  padding: 0 16px;
-  font-size: 16px; /* 16px stops iOS zooming on focus */
-  color: var(--ink);
-}
-.field::placeholder {
-  color: var(--ink-2);
-  opacity: 0.8;
-}
-.field:focus-visible {
-  outline: 2px solid var(--a2);
-  outline-offset: 1px;
-}
-
-:focus-visible {
-  outline: 2px solid var(--a2);
-  outline-offset: 2px;
-}
-
-/* Leave room for the iPhone home indicator. */
-.pb-safe {
-  padding-bottom: max(24px, env(safe-area-inset-bottom));
-}
-.pt-safe {
-  padding-top: max(20px, env(safe-area-inset-top));
+  /* Leave room for the iPhone home indicator. */
+  .pb-safe {
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
+  .pt-safe {
+    padding-top: max(20px, env(safe-area-inset-top));
+  }
 }
 
 @keyframes pop {

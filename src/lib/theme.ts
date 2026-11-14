@@ -40,8 +40,8 @@ export const AVATAR_BGS = [
 ] as const;
 
 export const AVATAR_EMOJIS = [
-  "🌻", "🌸", "🌊", "🐝", "🍓", "🌙", "🍋", "🌿",
-  "🦊", "🐢", "🌈", "🔥", "⭐", "🍑", "🦋", "🐻",
+  "🌻", "🌸", "🌊", "🍓", "🐝", "🌙", "🍋", "🦋",
+  "🌿", "🍑", "🐢", "🦊", "☀️", "⭐", "🔥", "💫",
 ];
 
 export const CHEER_EMOJIS = ["🔥", "👏", "💪", "❤️"] as const;
