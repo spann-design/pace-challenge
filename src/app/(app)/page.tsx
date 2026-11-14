@@ -38,9 +38,12 @@ export default function Home() {
   if (!goals || !logs) return <Spinner />;
 
   const rows = buildToday(goals, logs, day, stats).sort((a, b) => Number(a.goal.cadence === "weekly") - Number(b.goal.cadence === "weekly"));
-  const { done, total } = countToday(rows);
-  const status = statusWord(done, total);
-  const complete = total > 0 && done === total;
+  const todayCount = countToday(rows);
+  // Only weekly goals and nothing logged yet today: show the week instead of 0/0.
+  const weekView = todayCount.total === 0 && rows.length > 0;
+  const { done, total } = weekView ? { done: rows.filter((r) => r.weekMet).length, total: rows.length } : todayCount;
+  const status = weekView ? (done === total ? "Week complete" : "This week") : statusWord(done, total);
+  const complete = !weekView && total > 0 && done === total;
   const streak = summary?.current_streak ?? 0;
 
   const celebrate = (goalId: string, msg: string) => {
@@ -60,7 +63,7 @@ export default function Home() {
       }
       // Daily: fill up to the target. Weekly: one check-in.
       const value = g.cadence === "daily" ? Math.max(1, g.target - row.todayTotal) : 1;
-      const after = { done: done + 1, total: row.counts ? total : total + 1 };
+      const after = { done: todayCount.done + 1, total: row.counts ? todayCount.total : todayCount.total + 1 };
       celebrate(g.id, `${g.title} done · ${after.done} of ${after.total}`);
       await addLog({ goal: g, date: day, value });
     } catch {
@@ -138,7 +141,7 @@ export default function Home() {
         onClose={() => setLogGoal(null)}
         onLogged={(g) => {
           const row = rows.find((r) => r.goal.id === g.id);
-          const after = { done: row?.done ? done : done + 1, total: row?.counts ? total : total + 1 };
+          const after = { done: row?.done ? todayCount.done : todayCount.done + 1, total: row?.counts ? todayCount.total : todayCount.total + 1 };
           setLogGoal(null);
           celebrate(g.id, `${g.title} logged · ${after.done} of ${after.total}`);
         }}
@@ -150,7 +153,7 @@ export default function Home() {
           date={day}
           alreadyMin={timerRow.todayTotal}
           streak={stats?.find((s) => s.goal_id === timerRow.goal.id)?.current_streak ?? 0}
-          summary={`${done} of ${total} done today`}
+          summary={`${todayCount.done} of ${todayCount.total} done today`}
           onClose={(msg) => {
             const id = timerRow.goal.id;
             setTimerRow(null);

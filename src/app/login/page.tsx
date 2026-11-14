@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useState, type FormEvent } from "react";
 import { Icon } from "@/components/icon";
 import { Logo } from "@/components/logo";
@@ -18,7 +18,6 @@ export default function LoginPage() {
 }
 
 function Login() {
-  const router = useRouter();
   const params = useSearchParams();
   const nextParam = params.get("next");
   const next = nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/";
@@ -62,8 +61,8 @@ function Login() {
       setError("That code didn’t work. Check the latest email, or send a new one.");
       return;
     }
-    router.replace(next);
-    router.refresh();
+    // Full page load so every screen starts fresh with the new sign-in cookie.
+    window.location.replace(new URL(next, window.location.origin).href);
   }
 
   return (
