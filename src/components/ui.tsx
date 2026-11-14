@@ -1,72 +1,341 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { PACE_LABEL, type Pace } from "@/lib/metrics";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ButtonHTMLAttributes,
+  type ReactNode,
+} from "react";
+import { Flame, Icon } from "./icon";
 
-/** Status always pairs color with an icon and a label, never color alone. */
-const PACE_STYLE: Record<Pace, { color: string; icon: string }> = {
-  ahead: { color: "var(--good)", icon: "M12 19V5m-6 6l6-6 6 6" },
-  on_track: { color: "var(--good)", icon: "M5 12l4 4L19 6" },
-  behind: { color: "var(--serious)", icon: "M12 7v6m0 4h.01" },
-  no_data: { color: "var(--muted)", icon: "M6 12h12" },
+export function cx(...parts: (string | false | null | undefined)[]) {
+  return parts.filter(Boolean).join(" ");
+}
+
+// ---------------------------------------------------------------------------
+// Buttons: pills, 44px+ tall.
+// ---------------------------------------------------------------------------
+
+type Variant = "accent" | "dark" | "outline" | "plain";
+const VARIANTS: Record<Variant, string> = {
+  accent: "bg-accent",
+  dark: "bg-ink text-bg",
+  outline: "bg-surface text-ink border-[1.5px] border-line",
+  plain: "bg-surface text-ink",
+};
+const SIZES = {
+  sm: "h-11 px-4 text-[14px]",
+  md: "h-[52px] px-6 text-[16px]",
+  lg: "h-14 px-7 text-[17px]",
 };
 
-/** `onHero`: solid white pill for use on the red highlight card. */
-export function PaceBadge({ pace, small, onHero }: { pace: Pace; small?: boolean; onHero?: boolean }) {
-  const s = PACE_STYLE[pace];
+export function Button({
+  variant = "accent",
+  size = "md",
+  className,
+  children,
+  ...rest
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: keyof typeof SIZES }) {
+  return (
+    <button
+      type="button"
+      {...rest}
+      className={cx(
+        "inline-flex cursor-pointer items-center justify-center gap-2 rounded-full font-semibold transition-opacity disabled:cursor-default disabled:opacity-50",
+        VARIANTS[variant],
+        SIZES[size],
+        className,
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function IconButton({
+  icon,
+  label,
+  className,
+  size = 18,
+  ...rest
+}: ButtonHTMLAttributes<HTMLButtonElement> & { icon: string; label: string; size?: number }) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      {...rest}
+      className={cx(
+        "flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full bg-surface text-ink",
+        className,
+      )}
+    >
+      <Icon name={icon} size={size} strokeWidth={2} />
+    </button>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Surfaces
+// ---------------------------------------------------------------------------
+
+export function Card({ className, children }: { className?: string; children: ReactNode }) {
+  return <div className={cx("rounded-card bg-surface shadow-card", className)}>{children}</div>;
+}
+
+export function Avatar({
+  emoji,
+  bg,
+  size = 44,
+  ring = false,
+}: {
+  emoji: string;
+  bg: string;
+  size?: number;
+  ring?: boolean;
+}) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full font-semibold ${onHero ? "text-[#0b0b0b]" : "text-ink"} ${
-        small ? "px-2 py-0.5 text-xs" : "px-2.5 py-1 text-sm"
-      }`}
-      style={{ background: onHero ? "#ffffff" : `color-mix(in srgb, ${s.color} 16%, transparent)` }}
+      aria-hidden="true"
+      className="flex shrink-0 items-center justify-center rounded-full"
+      style={{
+        width: size,
+        height: size,
+        background: bg,
+        fontSize: Math.round(size * 0.5),
+        boxShadow: ring ? "0 0 0 2px var(--surface), 0 0 0 4px var(--a1)" : bg === "#FFFFFF" ? "inset 0 0 0 1px var(--hairline)" : undefined,
+      }}
     >
-      <svg viewBox="0 0 24 24" className={small ? "h-3.5 w-3.5" : "h-4 w-4"} fill="none" stroke={s.color} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <path d={s.icon} />
-      </svg>
-      {PACE_LABEL[pace]}
+      {emoji}
     </span>
   );
 }
 
-export function StatTile({ label, value, sub }: { label: string; value: ReactNode; sub?: ReactNode }) {
+export function StreakChip({ days, className }: { days: number; className?: string }) {
   return (
-    <div className="card !p-3.5">
-      <div className="text-xs font-medium text-ink-2">{label}</div>
-      <div className="mt-1 text-2xl font-bold leading-tight tracking-tight">{value}</div>
-      {sub && <div className="mt-0.5 text-xs text-muted">{sub}</div>}
-    </div>
-  );
-}
-
-/** Thin horizontal meter, e.g. habit consistency. */
-export function Meter({ value, label, onHero }: { value: number; label: string; onHero?: boolean }) {
-  const pct = Math.round(Math.max(0, Math.min(1, value)) * 100);
-  return (
-    <div
-      className={`h-2 w-full overflow-hidden rounded-full ${onHero ? "bg-white/30" : "bg-surface-2"}`}
-      role="meter"
-      aria-valuenow={pct}
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-label={label}
+    <span
+      className={cx(
+        "inline-flex h-8 items-center gap-1.5 rounded-full bg-subtle px-3 text-[13px] font-semibold text-ink",
+        className,
+      )}
     >
-      <div className={`h-full rounded-full ${onHero ? "bg-white" : "bg-accent"}`} style={{ width: `${pct}%` }} />
-    </div>
+      <Flame />
+      {days}-day streak
+    </span>
   );
 }
 
-export function SectionTitle({ children, action }: { children: ReactNode; action?: ReactNode }) {
+export function StatusChip({ onTrack }: { onTrack: boolean }) {
   return (
-    <div className="mb-2 mt-6 flex items-end justify-between gap-3">
-      <h2 className="text-base font-bold">{children}</h2>
-      {action}
+    <span
+      className={cx(
+        "inline-flex h-6 items-center gap-1.5 rounded-full px-2.5 text-[12px] font-semibold",
+        onTrack ? "bg-good-bg text-good-ink" : "bg-warn-bg text-warn-ink",
+      )}
+    >
+      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+      {onTrack ? "On track" : "Slipping"}
+    </span>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Controls
+// ---------------------------------------------------------------------------
+
+/** − value + control. */
+export function Stepper({
+  value,
+  onChange,
+  step = 1,
+  min = 0,
+  max = Infinity,
+  format = (v) => String(v),
+  lessLabel = "Less",
+  moreLabel = "More",
+}: {
+  value: number;
+  onChange: (v: number) => void;
+  step?: number;
+  min?: number;
+  max?: number;
+  format?: (v: number) => string;
+  lessLabel?: string;
+  moreLabel?: string;
+}) {
+  const btn =
+    "h-11 w-11 cursor-pointer rounded-full border-[1.5px] border-line bg-surface text-[20px] font-semibold text-ink disabled:opacity-40";
+  return (
+    <div className="flex items-center gap-2">
+      <button type="button" aria-label={lessLabel} className={btn} disabled={value <= min} onClick={() => onChange(Math.max(min, value - step))}>
+        −
+      </button>
+      <span className="min-w-[72px] text-center font-display text-[22px] font-semibold tabular" aria-live="polite">
+        {format(value)}
+      </span>
+      <button type="button" aria-label={moreLabel} className={btn} disabled={value >= max} onClick={() => onChange(Math.min(max, value + step))}>
+        +
+      </button>
     </div>
   );
 }
 
-export function Empty({ children }: { children: ReactNode }) {
-  return <div className="card text-center text-sm text-ink-2">{children}</div>;
+/** Pill option (selected = gradient). */
+export function Chip({
+  selected,
+  onClick,
+  children,
+  className,
+  ...rest
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: ReactNode;
+  className?: string;
+} & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick">) {
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      onClick={onClick}
+      {...rest}
+      className={cx(
+        "h-11 shrink-0 cursor-pointer rounded-full px-4 text-[14px] font-semibold text-ink",
+        selected ? "bg-accent" : "border-[1.5px] border-line bg-surface",
+        className,
+      )}
+    >
+      {children}
+    </button>
+  );
 }
 
-export const FREQUENCY_LABEL = (n: number) => (n === 7 ? "Daily" : `${n}× per week`);
+export function Switch({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      onClick={() => onChange(!checked)}
+      className="flex h-11 w-[60px] shrink-0 cursor-pointer items-center"
+    >
+      <span
+        className={cx("flex h-8 w-[52px] items-center rounded-full p-1 transition-colors", checked ? "bg-accent justify-end" : "justify-start bg-ink-3")}
+      >
+        <span className="h-6 w-6 rounded-full bg-white shadow" />
+      </span>
+    </button>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Bottom sheet
+// ---------------------------------------------------------------------------
+
+export function Sheet({
+  open,
+  onClose,
+  title,
+  subtitle,
+  children,
+  role = "dialog",
+}: {
+  open: boolean;
+  onClose: () => void;
+  title?: ReactNode;
+  subtitle?: ReactNode;
+  children: ReactNode;
+  role?: "dialog" | "alertdialog";
+}) {
+  const panel = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    panel.current?.focus();
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+  return (
+    <div className="animate-fade fixed inset-0 z-50 flex flex-col justify-end bg-[var(--scrim)]" onClick={onClose}>
+      <div
+        ref={panel}
+        role={role}
+        aria-modal="true"
+        aria-label={typeof title === "string" ? title : undefined}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+        className="animate-sheet pb-safe mx-auto flex max-h-[92dvh] w-full max-w-[480px] flex-col gap-[18px] overflow-y-auto rounded-t-[32px] bg-bg px-5 pt-3 outline-none"
+      >
+        <span className="h-[5px] w-10 shrink-0 self-center rounded-full bg-line" />
+        {title !== undefined && (
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-0.5">
+              <h2 className="text-[28px] leading-tight">{title}</h2>
+              {subtitle && <span className="text-[13px] text-ink-2">{subtitle}</span>}
+            </div>
+            <IconButton icon="close" label="Close" onClick={onClose} />
+          </div>
+        )}
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Toasts: dark pill above the tab bar.
+// ---------------------------------------------------------------------------
+
+const ToastCtx = createContext<(msg: string) => void>(() => {});
+export const useToast = () => useContext(ToastCtx);
+
+export function ToastProvider({ children }: { children: ReactNode }) {
+  const [msg, setMsg] = useState<{ text: string; key: number } | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const show = useCallback((text: string) => {
+    setMsg({ text, key: Date.now() });
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setMsg(null), 2400);
+  }, []);
+  useEffect(() => () => clearTimeout(timer.current), []);
+  return (
+    <ToastCtx.Provider value={show}>
+      {children}
+      <div aria-live="polite" className="pointer-events-none fixed inset-x-6 bottom-[108px] z-[60] mx-auto flex max-w-[420px] justify-center">
+        {msg && (
+          <div
+            key={msg.key}
+            role="status"
+            className="animate-fade flex h-[52px] items-center gap-2.5 rounded-full bg-[#2A2233] px-5 text-[15px] font-semibold text-white shadow-[0_12px_30px_rgba(42,34,51,0.25)]"
+          >
+            <span className="bg-accent flex h-6 w-6 items-center justify-center rounded-full">
+              <Icon name="check" size={14} strokeWidth={3} />
+            </span>
+            {msg.text}
+          </div>
+        )}
+      </div>
+    </ToastCtx.Provider>
+  );
+}
+
+export function Spinner({ label = "Loading" }: { label?: string }) {
+  return (
+    <div role="status" className="flex justify-center py-16">
+      <span className="sr-only">{label}</span>
+      <span className="h-8 w-8 animate-spin rounded-full border-[3px] border-hairline border-t-[var(--a2)]" />
+    </div>
+  );
+}
