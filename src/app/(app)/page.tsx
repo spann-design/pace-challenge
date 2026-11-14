@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState } from "react";
 import { useFrame } from "@/components/app-frame";
 import { ManageGoalsSheet } from "@/components/goal-sheets";
@@ -172,16 +173,17 @@ function WeekStrip({ day, goals, logs }: { day: string; goals: Goal[]; logs: Par
         const isFuture = d > day;
         const doneDay = !isFuture && dayComplete(goals, logs, d);
         return (
-          <div
+          <Link
             role="listitem"
             key={d}
-            aria-label={`${fmt.short(d)}${doneDay ? ", all done" : ""}`}
+            href={`/calendar?day=${d}`}
+            aria-label={`${fmt.short(d)}${doneDay ? ", all done" : ""}. Open in calendar`}
             className={cx("flex h-[76px] flex-col items-center justify-center gap-1 rounded-full", isToday && "bg-accent")}
           >
             <span className={cx("text-[11px] font-semibold uppercase tracking-[0.04em]", isToday ? "text-ink" : "text-ink-2")}>{fmt.dow(d)}</span>
             <span className="text-[17px] font-semibold">{fromISODate(d).getDate()}</span>
             <span className="h-[5px] w-[5px] rounded-full" style={{ background: doneDay ? (isToday ? "var(--ink)" : "var(--a2)") : "transparent" }} />
-          </div>
+          </Link>
         );
       })}
     </div>
