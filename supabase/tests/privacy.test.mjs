@@ -2,7 +2,7 @@
 const JESS = "11111111-1111-4111-8111-111111111111", ANA = "22222222-2222-4222-8222-222222222222";
 const GROUP = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 let fails = 0;
-export default async function (db) {
+export default async function runPrivacyTests(db) {
   const as = async (uid, sql, params = []) => {
     await db.exec(`reset role; set role ${uid ? "authenticated" : "anon"}; select set_config('request.jwt.claim.sub', '${uid ?? ""}', false);`);
     try {

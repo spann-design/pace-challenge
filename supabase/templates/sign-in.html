@@ -1,0 +1,17 @@
+<!--
+  Pace sign-in email. Paste this into Supabase:
+  Authentication -> Emails -> Templates -> "Magic Link" AND "Confirm signup".
+  Subject for both: Your Pace code: {{ .Token }}
+-->
+<div style="background:#FAF6F2;padding:32px 16px;font-family:'DM Sans',Helvetica,Arial,sans-serif;color:#2A2233">
+  <div style="max-width:420px;margin:0 auto;background:#FFFFFF;border-radius:28px;padding:32px 28px;text-align:center">
+    <div style="width:56px;height:56px;margin:0 auto 16px;border-radius:18px;background:linear-gradient(120deg,#F6B46E,#B48AF0)"></div>
+    <h1 style="margin:0 0 8px;font-family:Georgia,serif;font-weight:500;font-size:26px">Your Pace code</h1>
+    <p style="margin:0 0 20px;font-size:15px;color:#665E70">Enter this in the app to sign in.</p>
+    <p style="margin:0 0 24px;font-family:Georgia,serif;font-size:38px;letter-spacing:8px;font-weight:600">{{ .Token }}</p>
+    <p style="margin:0 0 20px;font-size:14px;color:#665E70">Or tap this button on the device you’re signing in on:</p>
+    <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
+       style="display:inline-block;padding:14px 28px;border-radius:999px;background:#2A2233;color:#FFFFFF;font-weight:600;font-size:16px;text-decoration:none">Sign in to Pace</a>
+    <p style="margin:24px 0 0;font-size:12px;color:#8E8597">The code expires in an hour. If you didn’t ask for it, ignore this email.</p>
+  </div>
+</div>
