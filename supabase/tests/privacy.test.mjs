@@ -66,8 +66,17 @@ export default async function runPrivacyTests(db) {
   const jessPrivLog = (await db.query(`select l.id from progress_logs l join goals g on g.id=l.goal_id where l.user_id=$1 and g.visibility='private' limit 1`, [JESS])).rows[0].id;
   r = await as(ME, `insert into cheers (log_id, emoji) values ($1, '🔥')`, [jessLog]);
   check("stranger cannot cheer", !!r.error, r);
-  r = await as(ANA, `insert into cheers (log_id, emoji) values ($1, '👏') on conflict (log_id, user_id) do update set emoji = excluded.emoji`, [jessLog]);
-  check("friend can cheer shared log (upsert)", !r.error, r);
+  // Same statement shape PostgREST uses for .upsert(): every column is rewritten on conflict.
+  const upsert = `insert into cheers (log_id, user_id, emoji) values ($1, $2, $3)
+    on conflict (log_id, user_id) do update set log_id = excluded.log_id, user_id = excluded.user_id, emoji = excluded.emoji`;
+  r = await as(ANA, upsert, [jessLog, ANA, "👏"]);
+  check("friend can cheer shared log", !r.error, r);
+  r = await as(ANA, upsert, [jessLog, ANA, "🔥"]);
+  check("friend can change their cheer (upsert)", !r.error, r);
+  r = await as(ANA, upsert, [jessPrivLog, ANA, "🔥"]);
+  check("upsert cannot target a private-goal log", !!r.error, r);
+  r = await as(ANA, `insert into cheers (log_id, user_id, emoji) values ($1, $2, '🔥')`, [jessLog, JESS]);
+  check("cannot cheer as someone else", !!r.error, r);
   r = await as(ANA, `insert into comments (log_id, body) values ($1, 'nice')`, [jessPrivLog]);
   check("friend cannot comment on private-goal log", !!r.error, r);
 
